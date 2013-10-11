@@ -1,4 +1,14 @@
 *.class
+.project
+.settings/
+.classpath
+.svn/
+.DS_Store
+
+temp/
+build/
+target/
+release/
 
 # Package Files #
 *.jar
