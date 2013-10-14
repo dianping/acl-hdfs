@@ -14,8 +14,7 @@ public class AuthRequest {
 
 	public AuthRequest(){}
 	
-	public AuthRequest(String user, String tableName, String tableHomePath,
-			int accessMode) {
+	public AuthRequest(String user, String tableName, int accessMode) {
 		super();
 		this.user = user;
 		this.tableName = tableName;

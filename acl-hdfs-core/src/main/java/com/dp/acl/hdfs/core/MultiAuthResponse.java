@@ -40,4 +40,9 @@ public class MultiAuthResponse {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "MultiAuthResponse [responses=" + responses + "]";
+	}
 }

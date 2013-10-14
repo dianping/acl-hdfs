@@ -40,4 +40,9 @@ public class MultiAuthRequest {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "MultiAuthRequest [requests=" + requests + "]";
+	}
 }

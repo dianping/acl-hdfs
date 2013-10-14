@@ -20,53 +20,50 @@ import com.dp.acl.hdfs.core.MultiAuthResponse;
 import com.dp.acl.hdfs.core.MultiAuthResponseDecoder;
 
 public class ACLAuthClient {
-	
+
 	private BlockingQueue<MultiAuthRequest> requestQueue = new LinkedBlockingQueue<MultiAuthRequest>();
 	private Map<MultiAuthRequest, MultiAuthResponse> resultMap = new ConcurrentHashMap<MultiAuthRequest, MultiAuthResponse>();
-	
+
 	private final String host;
 	private final int port;
-	
+
+	private EventLoopGroup group;
 	private Channel ch;
 	private ACLAuthRequestSender sender;
-	
+
 	public ACLAuthClient(String host, int port) throws Exception{
 		this.host = host;
 		this.port = port;
-		run();
 	}
-	
-	public void run() throws InterruptedException{
-		EventLoopGroup group = new NioEventLoopGroup();
-		try{
-			Bootstrap b = new Bootstrap();
-			b.group(group)
-			 .channel(NioSocketChannel.class)
-			 .handler(new ChannelInitializer<SocketChannel>(){
 
-				@Override
-				protected void initChannel(SocketChannel ch) throws Exception {
-					ChannelPipeline pipeline = ch.pipeline();
-					pipeline.addLast(new MultiAuthRequestEncoder());
-					pipeline.addLast(new MultiAuthResponseDecoder());
-					pipeline.addLast(new ACLAuthClientHandler(resultMap));
-				}
-				 
-			 });
-			
-			ch = b.connect(host, port).sync().channel();
-			sender = new ACLAuthRequestSender(ch, requestQueue);
-			sender.start();
-		}finally{
-			group.shutdownGracefully();
-		}
+	public void init() throws InterruptedException{
+		group = new NioEventLoopGroup();
+		Bootstrap b = new Bootstrap();
+		b.group(group)
+		.channel(NioSocketChannel.class)
+		.handler(new ChannelInitializer<SocketChannel>(){
+
+			@Override
+			protected void initChannel(SocketChannel ch) throws Exception {
+				ChannelPipeline pipeline = ch.pipeline();
+				pipeline.addLast(new MultiAuthRequestEncoder());
+				pipeline.addLast(new MultiAuthResponseDecoder());
+				pipeline.addLast(new ACLAuthClientHandler(resultMap));
+			}
+
+		});
+
+		ch = b.connect(host, port).sync().channel();
+		sender = new ACLAuthRequestSender(ch, requestQueue);
+		sender.start();
 	}
-	
+
 	public void close() throws InterruptedException{
 		ch.closeFuture().sync();
 		sender.close();
+		group.shutdownGracefully();
 	}
-	
+
 	public MultiAuthResponse send(MultiAuthRequest request, long timeoutInSecond) throws InterruptedException{
 		long startTime = System.currentTimeMillis();
 		requestQueue.offer(request);

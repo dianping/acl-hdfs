@@ -74,6 +74,12 @@ public class AuthResponse {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return "AuthResponse [realUser=" + realUser + ", tableHomePath="
+				+ tableHomePath + ", encryptedInfo=" + encryptedInfo + "]";
+	}
+
 	public boolean valid(){
 		if(StringUtils.isEmpty(realUser) || 
 		   StringUtils.isEmpty(tableHomePath) || 
