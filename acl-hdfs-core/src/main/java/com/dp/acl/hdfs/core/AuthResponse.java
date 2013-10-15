@@ -1,8 +1,12 @@
 package com.dp.acl.hdfs.core;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.StringUtils;
 
-public class AuthResponse {
+public class AuthResponse implements Serializable{
+	
+	private static final long serialVersionUID = 5420917516967896978L;
 	
 	private String realUser;
 	private String tableHomePath;

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MultiAuthResponseEncoder extends MessageToByteEncoder<MultiAuthResponse>{
@@ -14,43 +16,41 @@ public class MultiAuthResponseEncoder extends MessageToByteEncoder<MultiAuthResp
 		if(!valid(msg))
 			throw new RuntimeException("authorization responses is not valid");
 		
-		int dataLen = getDataLength(msg);
+		List<byte[]> requestByteList = new ArrayList<byte[]>();
+		List<byte[]> responseByteList = new ArrayList<byte[]>();
+		for(Map.Entry<AuthRequest, AuthResponse> entry: msg.getResponses().entrySet()){
+			if(entry != null && entry.getKey() != null && entry.getValue() != null){
+				requestByteList.add(SerDeserUtils.serialize(entry.getKey()));
+				responseByteList.add(SerDeserUtils.serialize(entry.getValue()));
+			}
+		}
+		
+		int dataLen = getDataLength(requestByteList, responseByteList);
 		Map<AuthRequest, AuthResponse> responseMap = msg.getResponses();
 		
 		out.writeByte((byte)'R');  //magic number
 		out.writeInt(dataLen);
 		out.writeInt(responseMap.size());
 		
-		for(Map.Entry<AuthRequest, AuthResponse> entry: responseMap.entrySet()){
-			encodeAuthResponse(out, entry.getKey(), entry.getValue());
+		for(int i = 0; i <  requestByteList.size(); i++){
+			byte[] requestByte = requestByteList.get(i);
+			byte[] responseByte = responseByteList.get(i);
+			out.writeInt(requestByte.length);
+			out.writeBytes(requestByte);
+			out.writeInt(responseByte.length);
+			out.writeBytes(responseByte);
 		}
 	}
 	
-	private void encodeAuthResponse(ByteBuf out, AuthRequest req, AuthResponse resp){
-		out.writeInt(req.getAccessMode());
-		out.writeInt(req.getUserLength());
-		out.writeBytes(req.getUser().getBytes());
-		out.writeInt(req.getTableNameLength());
-		out.writeBytes(req.getTableName().getBytes());
-		out.writeInt(resp.getRealUserLength());
-		out.writeBytes(resp.getRealUser().getBytes());
-		out.writeInt(resp.getTableHomePathLength());
-		out.writeBytes(resp.getTableHomePath().getBytes());
-		out.writeInt(resp.getEncryptedInfoLength());
-		out.writeBytes(resp.getEncryptedInfo().getBytes());
-	}
-	
-	private int getDataLength(MultiAuthResponse msg){
+	private int getDataLength(List<byte[]> requestByteList, List<byte[]> responseByteList){
 		int dataLen = 4;  //response number
-		for(Map.Entry<AuthRequest, AuthResponse> entry: msg.getResponses().entrySet()){
-			AuthRequest req = entry.getKey();
-			dataLen += req.getAccessModeLength();
-			dataLen += req.getUserLength();
-			dataLen += req.getTableNameLength();
-			AuthResponse resp = entry.getValue();
-			dataLen += resp.getRealUserLength();
-			dataLen += resp.getTableHomePathLength();
-			dataLen += resp.getEncryptedInfoLength();
+		for(byte[] requestByte: requestByteList){
+			dataLen += 4;  //request len
+			dataLen += requestByte.length;
+		}
+		for(byte[] responseByte: responseByteList){
+			dataLen += 4;  //request len
+			dataLen += responseByte.length;
 		}
 		return dataLen;
 	}

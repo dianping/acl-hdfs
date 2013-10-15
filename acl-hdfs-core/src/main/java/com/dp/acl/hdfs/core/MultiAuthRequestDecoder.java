@@ -2,11 +2,13 @@ package com.dp.acl.hdfs.core;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.CorruptedFrameException;
 
+import java.io.IOException;
 import java.util.List;
 
-public class MultiAuthRequestDecoder extends AbstractAuthDecoder{
+public class MultiAuthRequestDecoder extends ByteToMessageDecoder{
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
@@ -37,13 +39,12 @@ public class MultiAuthRequestDecoder extends AbstractAuthDecoder{
 		out.add(msg);
 	}
 	
-	private AuthRequest decodeAuthRequest(ByteBuf in){
-		AuthRequest request = new AuthRequest();
-		request.setAccessMode(in.readInt());
-		request.setUser(decodeString(in));
-		request.setTableName(decodeString(in));
+	private AuthRequest decodeAuthRequest(ByteBuf in) throws ClassNotFoundException, IOException{
+		int requestLen = in.readInt();
+		byte[] requestInByte = new byte[requestLen];
+		in.readBytes(requestInByte);
 		
-		return request;
+		return (AuthRequest)SerDeserUtils.deserialize(requestInByte);
 	}
 	
 

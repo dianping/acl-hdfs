@@ -1,8 +1,12 @@
 package com.dp.acl.hdfs.core;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.StringUtils;
 
-public class AuthRequest {
+public class AuthRequest implements Serializable{
+	
+	private static final long serialVersionUID = 3708043724071024047L;
 	
 	public static final int NONE = -1;
 	public static final int ACCESS_MODE_READ = 0;
@@ -84,17 +88,4 @@ public class AuthRequest {
 			return false;
 		return true;
 	}
-	
-	public int getUserLength(){
-		return user.getBytes().length;
-	}
-	
-	public int getTableNameLength(){
-		return tableName.getBytes().length;
-	}
-	
-	public int getAccessModeLength(){
-		return 4;
-	}
-
 }

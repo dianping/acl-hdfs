@@ -59,7 +59,6 @@ public class ACLAuthClient {
 	}
 
 	public void close() throws InterruptedException{
-		ch.closeFuture().sync();
 		sender.close();
 		group.shutdownGracefully();
 	}

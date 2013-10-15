@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthRequest>{
@@ -14,32 +16,30 @@ public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthReque
 		if(!valid(msg))
 			throw new RuntimeException("authorization requests is not valid");
 		
-		int dataLen = getDataLength(msg);
+		List<byte[]> requestByteList = new ArrayList<byte[]>();
+		for(AuthRequest req : msg.getRequests()){
+			if(req != null){
+				requestByteList.add(SerDeserUtils.serialize(req));
+			}
+		}
+		
+		int dataLen = getDataLength(requestByteList);
 		Set<AuthRequest> requests = msg.getRequests();
 		
 		out.writeByte((byte)'Q');  //magic number
 		out.writeInt(dataLen);
 		out.writeInt(requests.size());
-		for(AuthRequest req : requests){
-			encodeAuthRequest(out, req);
+		for(byte[] requestByte: requestByteList){
+			out.writeInt(requestByte.length);
+			out.writeBytes(requestByte);
 		}
 	}
-	
-	private void encodeAuthRequest(ByteBuf out, AuthRequest req){
-		out.writeInt(req.getAccessMode());
-		out.writeInt(req.getUserLength());
-		out.writeBytes(req.getUser().getBytes());
-		out.writeInt(req.getTableNameLength());
-		out.writeBytes(req.getTableName().getBytes());
-	}
 
-	private int getDataLength(MultiAuthRequest msg){
+	private int getDataLength(List<byte[]> requestByteList){
 		int dataLen = 4; //request number
-		Set<AuthRequest> requests = msg.getRequests();
-		for(AuthRequest req : requests){
-			dataLen += req.getAccessModeLength();
-			dataLen += req.getUserLength();
-			dataLen += req.getTableNameLength();
+		for(byte[] requestByte: requestByteList){
+			dataLen += 4;  //request len
+			dataLen += requestByte.length;
 		}
 		return dataLen;
 	}
