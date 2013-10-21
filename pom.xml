@@ -27,8 +27,8 @@
 	</dependencies>
 
 	<modules>
-		<module>core</module>
-		<module>client</module>
-		<module>server</module>
+		<module>acl-hdfs-core</module>
+		<module>acl-hdfs-client</module>
+		<module>acl-hdfs-server</module>
 	</modules>
 </project>
