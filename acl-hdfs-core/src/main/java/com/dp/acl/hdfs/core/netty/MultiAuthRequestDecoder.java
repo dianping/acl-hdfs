@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.core;
+package com.dp.acl.hdfs.core.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,7 +8,10 @@ import io.netty.handler.codec.CorruptedFrameException;
 import java.io.IOException;
 import java.util.List;
 
-public class MultiAuthResponseDecoder extends ByteToMessageDecoder{
+import com.dp.acl.hdfs.core.AuthRequest;
+import com.dp.acl.hdfs.core.MultiAuthRequest;
+
+public class MultiAuthRequestDecoder extends ByteToMessageDecoder{
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
@@ -19,7 +22,7 @@ public class MultiAuthResponseDecoder extends ByteToMessageDecoder{
 		in.markReaderIndex();
 		
 		int magicNumber = in.readUnsignedByte();
-		if(magicNumber != 'R'){
+		if(magicNumber != 'Q'){
 			in.resetReaderIndex();
 			throw new CorruptedFrameException("Invalid magic number: " + magicNumber);
 		}
@@ -30,10 +33,10 @@ public class MultiAuthResponseDecoder extends ByteToMessageDecoder{
 			return;
 		}
 		
-		int responseNum = in.readInt();
-		MultiAuthResponse msg = new MultiAuthResponse();
-		for(int i = 0; i < responseNum; i++){
-			msg.addResponse(decodeAuthRequest(in), decodeAuthResponse(in));
+		int requestNum = in.readInt();
+		MultiAuthRequest msg = new MultiAuthRequest();
+		for(int i = 0; i < requestNum; i++){
+			msg.addRequest(decodeAuthRequest(in));
 		}
 		
 		out.add(msg);
@@ -41,18 +44,11 @@ public class MultiAuthResponseDecoder extends ByteToMessageDecoder{
 	
 	private AuthRequest decodeAuthRequest(ByteBuf in) throws ClassNotFoundException, IOException{
 		int requestLen = in.readInt();
-		byte[] byteArray = new byte[requestLen];
-		in.readBytes(byteArray);
+		byte[] requestInByte = new byte[requestLen];
+		in.readBytes(requestInByte);
 		
-		return (AuthRequest)SerDeserUtils.deserialize(byteArray);
+		return (AuthRequest)SerDeserUtils.deserialize(requestInByte);
 	}
 	
-	private AuthResponse decodeAuthResponse(ByteBuf in) throws ClassNotFoundException, IOException{
-		int requestLen = in.readInt();
-		byte[] byteArray = new byte[requestLen];
-		in.readBytes(byteArray);
-		
-		return (AuthResponse)SerDeserUtils.deserialize(byteArray);
-	}
 
 }

@@ -24,11 +24,16 @@
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-core</artifactId>
+			<version>1.0.3</version>
+		</dependency>
 	</dependencies>
 
 	<modules>
-		<module>core</module>
-		<module>client</module>
-		<module>server</module>
+		<module>acl-hdfs-core</module>
+		<module>acl-hdfs-client</module>
+		<module>acl-hdfs-server</module>
 	</modules>
 </project>

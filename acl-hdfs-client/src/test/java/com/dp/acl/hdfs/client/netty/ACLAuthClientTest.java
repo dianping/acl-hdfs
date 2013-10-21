@@ -1,5 +1,6 @@
-package com.dp.acl.hdfs.client;
+package com.dp.acl.hdfs.client.netty;
 
+import com.dp.acl.hdfs.client.netty.ACLAuthClient;
 import com.dp.acl.hdfs.core.AuthRequest;
 import com.dp.acl.hdfs.core.MultiAuthRequest;
 import com.dp.acl.hdfs.core.MultiAuthResponse;

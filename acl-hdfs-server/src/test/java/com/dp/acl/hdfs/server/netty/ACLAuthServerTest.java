@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.server;
+package com.dp.acl.hdfs.server.netty;
 
 import java.util.Set;
 
@@ -6,6 +6,8 @@ import com.dp.acl.hdfs.core.AuthRequest;
 import com.dp.acl.hdfs.core.AuthResponse;
 import com.dp.acl.hdfs.core.MultiAuthRequest;
 import com.dp.acl.hdfs.core.MultiAuthResponse;
+import com.dp.acl.hdfs.server.netty.ACLAuthServer;
+import com.dp.acl.hdfs.server.netty.IACLAuthService;
 
 public class ACLAuthServerTest {
 	

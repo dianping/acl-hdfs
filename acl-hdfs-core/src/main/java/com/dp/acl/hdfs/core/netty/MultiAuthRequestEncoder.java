@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.core;
+package com.dp.acl.hdfs.core.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,6 +7,9 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import com.dp.acl.hdfs.core.AuthRequest;
+import com.dp.acl.hdfs.core.MultiAuthRequest;
 
 public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthRequest>{
 
