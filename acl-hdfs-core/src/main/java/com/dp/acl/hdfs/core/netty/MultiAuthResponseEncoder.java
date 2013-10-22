@@ -17,7 +17,7 @@ public class MultiAuthResponseEncoder extends MessageToByteEncoder<MultiAuthResp
 	@Override
 	protected void encode(ChannelHandlerContext ctx, MultiAuthResponse msg,
 			ByteBuf out) throws Exception {
-		if(!valid(msg))
+		if(!msg.valid())
 			throw new RuntimeException("authorization responses is not valid");
 		
 		List<byte[]> requestByteList = new ArrayList<byte[]>();
@@ -58,18 +58,4 @@ public class MultiAuthResponseEncoder extends MessageToByteEncoder<MultiAuthResp
 		}
 		return dataLen;
 	}
-	
-	private boolean valid(MultiAuthResponse msg){
-		boolean valid = true;
-		for(Map.Entry<AuthRequest, AuthResponse> entry: msg.getResponses().entrySet()){
-			AuthRequest req = entry.getKey();
-			AuthResponse resp = entry.getValue();
-			if(!req.valid() || !resp.valid()){
-				valid = false;
-				break;
-			}
-		}
-		return valid;
-	}
-
 }

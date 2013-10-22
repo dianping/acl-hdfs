@@ -23,6 +23,8 @@ public class ACLClient {
 	}
 	
 	public MultiAuthResponse authorize(MultiAuthRequest requests) throws Exception{
+		if(!requests.valid())
+			throw new RuntimeException("There are invalid request in MultiAuthRequest, print all requests:" + requests.toString());
 		return server.authorize(requests);
 	}
 }

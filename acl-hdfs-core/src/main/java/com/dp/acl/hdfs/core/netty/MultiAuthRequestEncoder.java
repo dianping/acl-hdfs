@@ -16,7 +16,7 @@ public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthReque
 	@Override
 	protected void encode(ChannelHandlerContext ctx, MultiAuthRequest msg,
 			ByteBuf out) throws Exception {
-		if(!valid(msg))
+		if(!msg.valid())
 			throw new RuntimeException("authorization requests is not valid");
 		
 		List<byte[]> requestByteList = new ArrayList<byte[]>();
@@ -45,16 +45,5 @@ public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthReque
 			dataLen += requestByte.length;
 		}
 		return dataLen;
-	}
-	
-	private boolean valid(MultiAuthRequest msg){
-		boolean valid = true;
-		for(AuthRequest req : msg.getRequests()){
-			if(!req.valid()){
-				valid = false;
-				break;
-			}
-		}
-		return valid;
 	}
 }

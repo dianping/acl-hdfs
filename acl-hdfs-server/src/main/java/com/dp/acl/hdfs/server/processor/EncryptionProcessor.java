@@ -7,7 +7,7 @@ public class EncryptionProcessor implements IProcessor{
 
 	public boolean process(MultiAuthRequest request, MultiAuthResponse response) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

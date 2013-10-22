@@ -1,9 +1,14 @@
 package com.dp.acl.hdfs.core;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MultiAuthRequest {
+import org.apache.hadoop.io.Writable;
+
+public class MultiAuthRequest implements Writable{
 	
 	private Set<AuthRequest> requests = new HashSet<AuthRequest>();
 
@@ -44,5 +49,38 @@ public class MultiAuthRequest {
 	@Override
 	public String toString() {
 		return "MultiAuthRequest [requests=" + requests + "]";
+	}
+	
+	public boolean valid(){
+		boolean valid = true;
+		if(requests.isEmpty()){
+			valid = false;
+		}
+		for(AuthRequest req : requests){
+			if(!req.valid()){
+				valid = false;
+				break;
+			}
+		}
+		return valid;
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		int size = in.readInt();
+		requests.clear();
+		for(int i = 0; i < size; i++){
+		     AuthRequest req = (AuthRequest) ACLUtils.newInstance(AuthRequest.class);
+		     req.readFields(in);
+		     requests.add(req);
+		}
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeInt(requests.size());
+		for(AuthRequest req : requests){
+			req.write(out);
+		}
 	}
 }

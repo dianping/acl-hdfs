@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+	<property>
+		<name>hadoop.security.authentication</name>
+		<value>kerberos</value>
+	</property>
+
+	<property>
+		<name>hadoop.security.authorization</name>
+		<value>false</value>
+	</property>
+	
+	<property>
+		<name>dfs.acl.server.kerberos.principal</name>
+		<value>hadoop/_HOST@DIANPING.COM</value>
+	</property>
+
+</configuration>

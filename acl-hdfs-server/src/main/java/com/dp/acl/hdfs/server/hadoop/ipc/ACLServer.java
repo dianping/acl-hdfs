@@ -14,22 +14,19 @@ import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 
-import com.dp.acl.hdfs.core.AuthRequest;
 import com.dp.acl.hdfs.core.MultiAuthRequest;
 import com.dp.acl.hdfs.core.MultiAuthResponse;
 import com.dp.acl.hdfs.core.hadoop.ipc.ACLAuthorizationProtocol;
+import com.dp.acl.hdfs.core.hadoop.ipc.ACLDFSConfigKeys;
+import com.dp.acl.hdfs.server.processor.AuthValidationProcessor;
 import com.dp.acl.hdfs.server.processor.EncryptionProcessor;
 import com.dp.acl.hdfs.server.processor.GetTableHomePathProcessor;
 import com.dp.acl.hdfs.server.processor.IProcessor;
+import com.dp.acl.hdfs.server.processor.ResponseValidationProcessor;
 import com.dp.acl.hdfs.server.processor.UserProcessor;
-import com.dp.acl.hdfs.server.processor.ValidationProcessor;
 
 public class ACLServer implements ACLAuthorizationProtocol{
 
-	private static final String ACL_SERVER_RPC_ADDRESS_KEY = "dfs.acl.server.rpc-address";
-	private static final String ACL_SERVER_KEYTAB_FILE_KEY = "dfs.acl.server.keytab.file";
-	private static final String ACL_SERVER_USER_NAME_KEY = "dfs.acl.server.kerberos.principal";
-	private static final String ACL_SERVER_HANDLER_COUNT_KEY = "dfs.acl.server.handler.count";
 	private static final int ACL_SERVER_DEFAULT_PORT = 8080;
 	
 	private static final Log logger = LogFactory.getLog(ACLServer.class);
@@ -41,9 +38,10 @@ public class ACLServer implements ACLAuthorizationProtocol{
 
 	static{
 		processors.add(new UserProcessor());
-		processors.add(new ValidationProcessor());
+		processors.add(new AuthValidationProcessor());
 		processors.add(new GetTableHomePathProcessor());
 		processors.add(new EncryptionProcessor());
+		processors.add(new ResponseValidationProcessor());
 	}
 
 	@Override
@@ -53,6 +51,7 @@ public class ACLServer implements ACLAuthorizationProtocol{
 
 	@Override
 	public MultiAuthResponse authorize(MultiAuthRequest request) throws Exception {
+		System.out.println("Received Request: " + request.toString());
 		MultiAuthResponse response = new MultiAuthResponse();
 		for(IProcessor processor: processors){
 			if(!processor.process(request, response))
@@ -64,8 +63,8 @@ public class ACLServer implements ACLAuthorizationProtocol{
 	public ACLServer(String bindAddress, int port, int serverHandlerCount, Configuration conf) throws IOException, InterruptedException{
 		//Security
 		UserGroupInformation.setConfiguration(conf);
-	    SecurityUtil.login(conf, ACL_SERVER_KEYTAB_FILE_KEY, 
-	    		ACL_SERVER_USER_NAME_KEY, bindAddress);
+	    SecurityUtil.login(conf, ACLDFSConfigKeys.ACL_SERVER_KEYTAB_FILE_KEY, 
+	    		ACLDFSConfigKeys.ACL_SERVER_USER_NAME_KEY, bindAddress);
 		
 		rpcServer = RPC.getServer(this, bindAddress, port, serverHandlerCount, false, conf);
 		rpcServer.start();
@@ -79,13 +78,13 @@ public class ACLServer implements ACLAuthorizationProtocol{
 
 	public static void main(String[] args) throws IOException, InterruptedException{
 		Configuration conf = new Configuration();
-		String addressString = conf.get(ACL_SERVER_RPC_ADDRESS_KEY);
+		String addressString = conf.get(ACLDFSConfigKeys.ACL_SERVER_RPC_ADDRESS_KEY);
 		if(addressString == null){
 			logger.error("Bind Address is not specified!");
 			throw new RuntimeException("Bind Address is not specified!");	
 		}
 		InetSocketAddress address = NetUtils.createSocketAddr(addressString, ACL_SERVER_DEFAULT_PORT);
-	    int handlerCount = conf.getInt(ACL_SERVER_HANDLER_COUNT_KEY, 5);
+	    int handlerCount = conf.getInt(ACLDFSConfigKeys.ACL_SERVER_HANDLER_COUNT_KEY, 5);
 	    
 	    ACLServer server = new ACLServer(address.getHostName(), address.getPort(),
 	    		handlerCount, conf);
