@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.server;
+package com.dp.acl.hdfs.server.netty;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

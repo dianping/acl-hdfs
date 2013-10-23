@@ -11,6 +11,7 @@ public interface IProcessor {
 	 * @param response
 	 * @return continue or not?
 	 */
-	public boolean process(MultiAuthRequest request, MultiAuthResponse response);
+	public boolean process(MultiAuthRequest request, MultiAuthResponse response)
+		throws Exception;
 
 }

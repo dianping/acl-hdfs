@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.server;
+package com.dp.acl.hdfs.server.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -8,8 +8,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-import com.dp.acl.hdfs.core.MultiAuthRequestDecoder;
-import com.dp.acl.hdfs.core.MultiAuthResponseEncoder;
+import com.dp.acl.hdfs.core.netty.MultiAuthRequestDecoder;
+import com.dp.acl.hdfs.core.netty.MultiAuthResponseEncoder;
 
 public class ACLAuthServer {
 	

@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.client;
+package com.dp.acl.hdfs.client.netty;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -15,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.dp.acl.hdfs.core.MultiAuthRequest;
-import com.dp.acl.hdfs.core.MultiAuthRequestEncoder;
 import com.dp.acl.hdfs.core.MultiAuthResponse;
-import com.dp.acl.hdfs.core.MultiAuthResponseDecoder;
+import com.dp.acl.hdfs.core.netty.MultiAuthRequestEncoder;
+import com.dp.acl.hdfs.core.netty.MultiAuthResponseDecoder;
 
 public class ACLAuthClient {
 

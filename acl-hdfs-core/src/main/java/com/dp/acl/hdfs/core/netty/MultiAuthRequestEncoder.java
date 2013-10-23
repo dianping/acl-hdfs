@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.core;
+package com.dp.acl.hdfs.core.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.dp.acl.hdfs.core.AuthRequest;
+import com.dp.acl.hdfs.core.MultiAuthRequest;
+
 public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthRequest>{
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, MultiAuthRequest msg,
 			ByteBuf out) throws Exception {
-		if(!valid(msg))
+		if(!msg.valid())
 			throw new RuntimeException("authorization requests is not valid");
 		
 		List<byte[]> requestByteList = new ArrayList<byte[]>();
@@ -42,16 +45,5 @@ public class MultiAuthRequestEncoder extends MessageToByteEncoder<MultiAuthReque
 			dataLen += requestByte.length;
 		}
 		return dataLen;
-	}
-	
-	private boolean valid(MultiAuthRequest msg){
-		boolean valid = true;
-		for(AuthRequest req : msg.getRequests()){
-			if(!req.valid()){
-				valid = false;
-				break;
-			}
-		}
-		return valid;
 	}
 }

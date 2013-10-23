@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.server;
+package com.dp.acl.hdfs.server.netty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import com.dp.acl.hdfs.core.MultiAuthResponse;
 import com.dp.acl.hdfs.server.processor.EncryptionProcessor;
 import com.dp.acl.hdfs.server.processor.GetTableHomePathProcessor;
 import com.dp.acl.hdfs.server.processor.IProcessor;
-import com.dp.acl.hdfs.server.processor.ValidationProcessor;
+import com.dp.acl.hdfs.server.processor.AuthValidationProcessor;
 
 public class DefaultACLAuthService implements IACLAuthService{
 	
@@ -16,12 +16,12 @@ public class DefaultACLAuthService implements IACLAuthService{
 	private static final List<IProcessor> processors = new ArrayList<IProcessor>();
 	
 	static{
-		processors.add(new ValidationProcessor());
+		processors.add(new AuthValidationProcessor());
 		processors.add(new GetTableHomePathProcessor());
 		processors.add(new EncryptionProcessor());
 	}
 
-	public MultiAuthResponse process(MultiAuthRequest request) {
+	public MultiAuthResponse process(MultiAuthRequest request) throws Exception {
 		MultiAuthResponse response = new MultiAuthResponse();
 		for(IProcessor processor: processors){
 			if(!processor.process(request, response))

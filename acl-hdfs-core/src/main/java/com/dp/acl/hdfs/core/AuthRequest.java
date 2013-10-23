@@ -1,10 +1,14 @@
 package com.dp.acl.hdfs.core;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.io.Writable;
 
-public class AuthRequest implements Serializable{
+public class AuthRequest implements Serializable, Writable{
 	
 	private static final long serialVersionUID = 3708043724071024047L;
 	
@@ -84,8 +88,18 @@ public class AuthRequest implements Serializable{
 	}
 
 	public boolean valid(){
-		if(accessMode == NONE || StringUtils.isEmpty(user) || StringUtils.isEmpty(tableName))
+		if(accessMode == NONE || StringUtils.isEmpty(tableName))
 			return false;
 		return true;
+	}
+
+	public void readFields(DataInput in) throws IOException {
+		tableName = in.readUTF();
+		accessMode = in.readInt();
+	}
+
+	public void write(DataOutput out) throws IOException {
+		out.writeUTF(tableName);
+		out.writeInt(accessMode);
 	}
 }

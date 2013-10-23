@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.client;
+package com.dp.acl.hdfs.client.netty;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

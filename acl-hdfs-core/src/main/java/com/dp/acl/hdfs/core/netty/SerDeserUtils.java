@@ -1,4 +1,4 @@
-package com.dp.acl.hdfs.core;
+package com.dp.acl.hdfs.core.netty;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
