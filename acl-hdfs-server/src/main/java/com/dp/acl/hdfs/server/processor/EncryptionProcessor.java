@@ -6,21 +6,21 @@ import com.dp.acl.hdfs.core.AuthRequest;
 import com.dp.acl.hdfs.core.AuthResponse;
 import com.dp.acl.hdfs.core.MultiAuthRequest;
 import com.dp.acl.hdfs.core.MultiAuthResponse;
-import com.dp.acl.hdfs.server.service.AccessControlEncodingService;
-import com.dp.acl.hdfs.server.service.AccessControlInfo;
+import com.dp.acl.hdfs.server.service.ACLEncryptionService;
+import com.dp.acl.hdfs.server.service.ACLEncryptionInfo;
 
 public class EncryptionProcessor implements IProcessor{
 	
-	private AccessControlEncodingService service;
+	private ACLEncryptionService service;
 	
-	public EncryptionProcessor(AccessControlEncodingService service){
+	public EncryptionProcessor(ACLEncryptionService service){
 		this.service = service;
 	}
 
 	public boolean process(MultiAuthRequest request, MultiAuthResponse response) throws Exception{
 		for(Entry<AuthRequest, AuthResponse> entry : response.getResponses().entrySet()){
 			AuthResponse resp = entry.getValue();
-			AccessControlInfo info = service.encrypte(
+			ACLEncryptionInfo info = service.encrypte(
 					resp.getTableHomePath(), 
 					resp.getRealUser());
 			resp.setEncryptedInfo(info.getData());

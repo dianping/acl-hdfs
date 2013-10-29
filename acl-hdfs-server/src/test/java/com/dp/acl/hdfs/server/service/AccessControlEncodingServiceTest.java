@@ -11,7 +11,7 @@ import org.apache.hadoop.security.token.Token;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.dp.acl.hdfs.core.AccessControlDecoder;
+import com.dp.acl.hdfs.core.ACLDecryptor;
 
 public class AccessControlEncodingServiceTest {
 	
@@ -31,9 +31,9 @@ public class AccessControlEncodingServiceTest {
 		byte[] key = token.getPassword();
 		String path = "/tmp";
 		String username = "hadoop";
-		AccessControlInfo info = service.encrypte(path, username);
-		AccessControlDecoder decoder = new AccessControlDecoder(key);
-		String[] result = decoder.decode(info.getData());
+		ACLEncryptionInfo info = service.encrypte(path, username);
+		ACLDecryptor decryptor = new ACLDecryptor(key);
+		String[] result = decryptor.decrypt(info.getData());
 		assertEquals(username, result[0]);
 		assertEquals(path, result[1]);
 	}
@@ -49,7 +49,7 @@ public class AccessControlEncodingServiceTest {
 		assertNotEquals(token1, token2);
 	}
 	
-	private static final class TestAccessControlEncodingService extends AccessControlEncodingService{
+	private static final class TestAccessControlEncodingService extends ACLEncryptionService{
 
 		public TestAccessControlEncodingService(Configuration conf)
 				throws Exception {

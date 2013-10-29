@@ -9,11 +9,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-public class AccessControlEncoder {
+public class ACLEncryptor {
 	Cipher encryptor;
 	MessageDigest md;
 
-	public AccessControlEncoder(byte[] key) throws Exception {
+	public ACLEncryptor(byte[] key) throws Exception {
 		DESKeySpec dks = new DESKeySpec(key);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
 		SecretKey skey = skf.generateSecret(dks);
@@ -22,7 +22,7 @@ public class AccessControlEncoder {
 		md = MessageDigest.getInstance("MD5");
 	}
 
-	public byte[] encode(String path, String username) throws Exception {
+	public byte[] encrypt(String path, String username) throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(bos);
 		out.writeUTF(username);

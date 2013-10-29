@@ -1,14 +1,14 @@
 package com.dp.acl.hdfs.server.service;
 
 
-public class AccessControlInfo{
+public class ACLEncryptionInfo{
     byte[] data;
     byte[] tokenIdentifier;
     
-    public AccessControlInfo() {
+    public ACLEncryptionInfo() {
     }
     
-    public AccessControlInfo(byte[] _data, byte[] _tokenIdentifier) {
+    public ACLEncryptionInfo(byte[] _data, byte[] _tokenIdentifier) {
         data = _data;
         tokenIdentifier = _tokenIdentifier;
     }

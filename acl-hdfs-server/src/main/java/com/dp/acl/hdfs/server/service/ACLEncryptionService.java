@@ -10,11 +10,11 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.security.KerberosName;
 import org.apache.hadoop.security.token.Token;
 
-import com.dp.acl.hdfs.core.AccessControlEncoder;
+import com.dp.acl.hdfs.core.ACLEncryptor;
 import com.dp.acl.hdfs.core.hadoop.ipc.ACLDFSConfigKeys;
 
 
-public class AccessControlEncodingService {
+public class ACLEncryptionService {
 
 	private static final long UPDATE_INTERVAL = 24 * 60 * 60 * 1000;
 	private static final long SLEEP_INTERVAL = 60 * 60 * 1000;
@@ -23,13 +23,13 @@ public class AccessControlEncodingService {
 	private ClientProtocol dfsClient;
 	private long lastUpdatedTime;
 	private Configuration conf;
-	private AccessControlEncoder encoder;
+	private ACLEncryptor encryptor;
 
-	public AccessControlEncodingService(Configuration conf) throws Exception{
+	public ACLEncryptionService(Configuration conf) throws Exception{
 		this(conf, UPDATE_INTERVAL, SLEEP_INTERVAL);
 	}
 	
-	public AccessControlEncodingService(Configuration conf, long updateInterval, long sleepInterval) throws Exception{
+	public ACLEncryptionService(Configuration conf, long updateInterval, long sleepInterval) throws Exception{
 		this.dfsClient = DFSClient.createNamenode(conf);
 		this.conf = conf;
 		updateAccessControlEncoder();
@@ -41,11 +41,11 @@ public class AccessControlEncodingService {
 
 		private static Log logger = LogFactory.getLog(EncoderUpdater.class);
 
-		private AccessControlEncodingService service;
+		private ACLEncryptionService service;
 		private long updateInterval = -1;
 		private long sleepInterval = -1;
 
-		EncoderUpdater(AccessControlEncodingService service, long updateInterval, long sleepInterval){
+		EncoderUpdater(ACLEncryptionService service, long updateInterval, long sleepInterval){
 			this.updateInterval = updateInterval;
 			this.service = service;
 			this.sleepInterval = sleepInterval;
@@ -77,12 +77,12 @@ public class AccessControlEncodingService {
 		if(lastToken != null){
 			dfsClient.cancelDelegationToken(lastToken);
 		}
-		encoder = new AccessControlEncoder(token.getPassword());
+		encryptor = new ACLEncryptor(token.getPassword());
 	}
 	
-	public synchronized AccessControlInfo encrypte(String path, String username) throws Exception{
-		if(encoder != null){
-			return new AccessControlInfo(encoder.encode(path, username), token.getIdentifier());
+	public synchronized ACLEncryptionInfo encrypte(String path, String username) throws Exception{
+		if(encryptor != null){
+			return new ACLEncryptionInfo(encryptor.encrypt(path, username), token.getIdentifier());
 		}else{
 			throw new RuntimeException("encoder is empty!");
 		}

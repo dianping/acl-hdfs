@@ -10,12 +10,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-public class AccessControlDecoder {
+public class ACLDecryptor {
 
 	Cipher decryptor;
 	MessageDigest md;
 
-	public AccessControlDecoder(byte[] key) throws Exception{
+	public ACLDecryptor(byte[] key) throws Exception{
 		DESKeySpec dks = new DESKeySpec(key);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
 		SecretKey skey = skf.generateSecret(dks);
@@ -29,7 +29,7 @@ public class AccessControlDecoder {
 	 * String[0] = user
 	 * String[1] = path
 	 */
-	public String[] decode(byte[] encryptedString) throws Exception{
+	public String[] decrypt(byte[] encryptedString) throws Exception{
 		byte[] buf = decryptor.doFinal(encryptedString);
 		byte[] hash = Arrays.copyOfRange(buf, 0, 16);
 		byte[] decrypted = Arrays.copyOfRange(buf, 16, buf.length);

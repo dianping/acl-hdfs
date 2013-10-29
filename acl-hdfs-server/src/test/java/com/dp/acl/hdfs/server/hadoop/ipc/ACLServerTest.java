@@ -38,7 +38,7 @@ public class ACLServerTest {
 		String addressString = "localhost:7777";
 		InetSocketAddress address = NetUtils.createSocketAddr(addressString, 7777);
 	    int handlerCount = 5;
-	    ACLServer server = new ACLServer(address.getHostName(), address.getPort(),
+	    ACLTestServer server = new ACLTestServer(address.getHostName(), address.getPort(), 
 	    		handlerCount, conf);
 	    server.join();
 	}
