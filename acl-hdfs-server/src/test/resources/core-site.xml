@@ -25,4 +25,15 @@
 		<value>hadoop/_HOST@DIANPING.COM</value>
 	</property>
 
+	<property>
+		<name>dfs.namenode.kerberos.principal</name>
+		<value>hadoop/_HOST@DIANPING.COM</value>
+	</property>
+
+	<property>
+		<name>fs.default.name</name>
+		<value>hdfs://10.1.77.86/</value>
+		<final>true</final>
+	</property>
+
 </configuration>

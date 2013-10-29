@@ -23,7 +23,7 @@ public class ACLAuthServerTest {
 			MultiAuthResponse response = new MultiAuthResponse();
 			Set<AuthRequest> reqs = request.getRequests();
 			for(AuthRequest req : reqs){
-				AuthResponse resp = new AuthResponse("hadoop", "/tmp", "ABCD");
+				AuthResponse resp = new AuthResponse("hadoop", "/tmp", "ABCD".getBytes(), "ABCD".getBytes());
 				response.addResponse(req, resp);
 			}
 			return response;

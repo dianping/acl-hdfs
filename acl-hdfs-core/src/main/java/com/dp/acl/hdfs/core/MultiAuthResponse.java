@@ -3,6 +3,7 @@ package com.dp.acl.hdfs.core;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,7 +52,7 @@ public class MultiAuthResponse implements Writable{
 	public String toString() {
 		return "MultiAuthResponse [responses=" + responses + "]";
 	}
-	
+
 	public boolean valid(){
 		boolean valid = true;
 		if(responses.isEmpty()){

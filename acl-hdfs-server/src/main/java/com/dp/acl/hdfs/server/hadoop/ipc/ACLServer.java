@@ -24,6 +24,7 @@ import com.dp.acl.hdfs.server.processor.GetTableHomePathProcessor;
 import com.dp.acl.hdfs.server.processor.IProcessor;
 import com.dp.acl.hdfs.server.processor.ResponseValidationProcessor;
 import com.dp.acl.hdfs.server.processor.UserProcessor;
+import com.dp.acl.hdfs.server.service.AccessControlEncodingService;
 
 public class ACLServer implements ACLAuthorizationProtocol{
 
@@ -32,17 +33,9 @@ public class ACLServer implements ACLAuthorizationProtocol{
 	private static final Log logger = LogFactory.getLog(ACLServer.class);
 
 	//TODO could move it to a separate class and make it configurable in external files
-	private static final List<IProcessor> processors = new ArrayList<IProcessor>();
+	private final List<IProcessor> processors = new ArrayList<IProcessor>();
 
 	private Server rpcServer;
-
-	static{
-		processors.add(new UserProcessor());
-		processors.add(new AuthValidationProcessor());
-		processors.add(new GetTableHomePathProcessor());
-		processors.add(new EncryptionProcessor());
-		processors.add(new ResponseValidationProcessor());
-	}
 
 	@Override
 	public long getProtocolVersion(String protocol, long clientVersion) throws IOException {
@@ -60,7 +53,14 @@ public class ACLServer implements ACLAuthorizationProtocol{
 		return response;
 	}
 
-	public ACLServer(String bindAddress, int port, int serverHandlerCount, Configuration conf) throws IOException, InterruptedException{
+	public ACLServer(String bindAddress, int port, int serverHandlerCount, Configuration conf) throws Exception{
+		AccessControlEncodingService aclEncodingService = new AccessControlEncodingService(conf);
+		processors.add(new UserProcessor());
+		processors.add(new AuthValidationProcessor());
+		processors.add(new GetTableHomePathProcessor());
+		processors.add(new EncryptionProcessor(aclEncodingService));
+		processors.add(new ResponseValidationProcessor());
+		
 		//Security
 		UserGroupInformation.setConfiguration(conf);
 	    SecurityUtil.login(conf, ACLDFSConfigKeys.ACL_SERVER_KEYTAB_FILE_KEY, 
@@ -76,7 +76,7 @@ public class ACLServer implements ACLAuthorizationProtocol{
 		} catch (InterruptedException ie) {}
 	}
 
-	public static void main(String[] args) throws IOException, InterruptedException{
+	public static void main(String[] args) throws Exception{
 		Configuration conf = new Configuration();
 		String addressString = conf.get(ACLDFSConfigKeys.ACL_SERVER_RPC_ADDRESS_KEY);
 		if(addressString == null){

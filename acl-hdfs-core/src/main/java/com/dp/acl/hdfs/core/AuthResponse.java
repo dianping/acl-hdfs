@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Writable;
@@ -14,47 +15,65 @@ public class AuthResponse implements Serializable, Writable{
 	
 	private String realUser;
 	private String tableHomePath;
-	private String encryptedInfo;
+	private byte[] encryptedInfo;
+	private byte[] tokenIndentifier;
 	
 	public AuthResponse(){}
 	
 	public AuthResponse(String realUser, String tableHomePath,
-			String encryptedInfo) {
+			byte[] encryptedInfo, byte[] tokenIndentifier) {
 		super();
 		this.realUser = realUser;
 		this.tableHomePath = tableHomePath;
 		this.encryptedInfo = encryptedInfo;
+		this.tokenIndentifier = tokenIndentifier;
 	}
+
 	public String getRealUser() {
 		return realUser;
 	}
+
 	public void setRealUser(String realUser) {
 		this.realUser = realUser;
 	}
+
 	public String getTableHomePath() {
 		return tableHomePath;
 	}
+
 	public void setTableHomePath(String tableHomePath) {
 		this.tableHomePath = tableHomePath;
 	}
-	public String getEncryptedInfo() {
+
+	public byte[] getEncryptedInfo() {
 		return encryptedInfo;
 	}
-	public void setEncryptedInfo(String encryptedInfo) {
+
+	public void setEncryptedInfo(byte[] encryptedInfo) {
 		this.encryptedInfo = encryptedInfo;
 	}
+		
+	public byte[] getTokenIndentifier() {
+		return tokenIndentifier;
+	}
+
+	public void setTokenIndentifier(byte[] tokenIndentifier) {
+		this.tokenIndentifier = tokenIndentifier;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((encryptedInfo == null) ? 0 : encryptedInfo.hashCode());
+		result = prime * result + Arrays.hashCode(encryptedInfo);
 		result = prime * result
 				+ ((realUser == null) ? 0 : realUser.hashCode());
 		result = prime * result
 				+ ((tableHomePath == null) ? 0 : tableHomePath.hashCode());
+		result = prime * result + Arrays.hashCode(tokenIndentifier);
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -64,10 +83,7 @@ public class AuthResponse implements Serializable, Writable{
 		if (getClass() != obj.getClass())
 			return false;
 		AuthResponse other = (AuthResponse) obj;
-		if (encryptedInfo == null) {
-			if (other.encryptedInfo != null)
-				return false;
-		} else if (!encryptedInfo.equals(other.encryptedInfo))
+		if (!Arrays.equals(encryptedInfo, other.encryptedInfo))
 			return false;
 		if (realUser == null) {
 			if (other.realUser != null)
@@ -79,19 +95,24 @@ public class AuthResponse implements Serializable, Writable{
 				return false;
 		} else if (!tableHomePath.equals(other.tableHomePath))
 			return false;
+		if (!Arrays.equals(tokenIndentifier, other.tokenIndentifier))
+			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "AuthResponse [realUser=" + realUser + ", tableHomePath="
-				+ tableHomePath + ", encryptedInfo=" + encryptedInfo + "]";
+				+ tableHomePath + ", encryptedInfo="
+				+ Arrays.toString(encryptedInfo) + ", tokenIndentifier="
+				+ Arrays.toString(tokenIndentifier) + "]";
 	}
 
 	public boolean valid(){
 		if(StringUtils.isEmpty(realUser) || 
 		   StringUtils.isEmpty(tableHomePath) || 
-		   StringUtils.isEmpty(encryptedInfo))
+		   encryptedInfo == null || encryptedInfo.length <= 0 ||
+		   tokenIndentifier == null || tokenIndentifier.length <= 0)
 			return false;
 		return true;
 	}
@@ -99,12 +120,21 @@ public class AuthResponse implements Serializable, Writable{
 	public void readFields(DataInput in) throws IOException {
 		realUser = in.readUTF();
 		tableHomePath = in.readUTF();
-		encryptedInfo = in.readUTF();
+		int encryptedInfoLen = in.readInt();
+		encryptedInfo = new byte[encryptedInfoLen];
+		in.readFully(encryptedInfo);
+		int tokenIdentifierLen = in.readInt();
+		tokenIndentifier = new byte[tokenIdentifierLen];
+		in.readFully(tokenIndentifier);
 	}
 
 	public void write(DataOutput out) throws IOException {
 		out.writeUTF(realUser);
 		out.writeUTF(tableHomePath);
-		out.writeUTF(encryptedInfo);
+		out.writeInt(encryptedInfo.length);
+		out.write(encryptedInfo);
+		out.writeInt(tokenIndentifier.length);
+		out.write(tokenIndentifier);
+		
 	}
 }
